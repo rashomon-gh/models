@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
     "axolotl[deepspeed,flast-attn]>=0.12.2",
+    "datasets>=4.0.0",
     "unsloth-zoo[base]>=2025.7.4",
     "unsloth[base]>=2025.7.2",
 ]
