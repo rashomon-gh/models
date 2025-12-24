@@ -1071,6 +1071,7 @@ dependencies = [
     { name = "datasets" },
     { name = "unsloth" },
     { name = "unsloth-zoo" },
+    { name = "wandb" },
 ]
 
 [package.metadata]
@@ -1079,6 +1080,7 @@ requires-dist = [
     { name = "datasets", specifier = ">=4.0.0" },
     { name = "unsloth", extras = ["base"], specifier = ">=2025.7.2" },
     { name = "unsloth-zoo", extras = ["base"], specifier = ">=2025.7.4" },
+    { name = "wandb", specifier = ">=0.23.1" },
 ]
 
 [[package]]
