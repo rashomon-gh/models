@@ -9,3 +9,6 @@ class Settings(BaseSettings):
         env_file = ".env"
         env_file_encoding = "utf-8"
         extra = "forbid"
+
+
+settings = Settings()  # type: ignore[call-arg]
