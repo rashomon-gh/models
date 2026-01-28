@@ -7,7 +7,21 @@ requires-python = ">=3.11"
 dependencies = [
     "axolotl[deepspeed,flast-attn]>=0.12.2",
     "datasets>=4.0.0",
+    "pydantic-settings>=2.12.0",
     "unsloth-zoo[base]>=2025.7.4",
     "unsloth[base]>=2025.7.2",
     "wandb>=0.23.1",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["finetuning"]
+
+[dependency-groups]
+dev = [
+    "pre-commit>=4.5.1",
+    "ruff>=0.14.10",
 ]

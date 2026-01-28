@@ -7,3 +7,4 @@ venv
 .code/
 .claude/
 .idea/
+.env
