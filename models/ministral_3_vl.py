@@ -1,10 +1,12 @@
 """
 Ministral-3-vl model training module.
 
-This module provides a self-contained implementation for fine-tuning the
+This module provides a self-contained implementation for fine-tuning
 Ministral-3-vl vision-language model using Unsloth.
 """
 
+import sys
+import argparse
 from unsloth import FastVisionModel
 from unsloth.trainer import UnslothVisionDataCollator
 from unsloth import is_bf16_supported
@@ -323,47 +325,278 @@ class Ministral3VLTrainer:
 
 
 if __name__ == "__main__":
-    # Configure model
-    model_config = ModelConfig(
-        model_name="unsloth/Ministral-3-3B-Instruct-2512",
-        load_in_4bit=False,  # Set to True to reduce memory usage
-        use_gradient_checkpointing="unsloth",
-        r=32,
-        lora_alpha=32,
-        lora_dropout=0,
+    # Configure logger
+    logger.remove()
+    logger.add(
+        sys.stdout,
+        format="<green>{time:YYYY-MM-DD HH:mm:ss}</green> | <level>{level: <8}</level> | <level>{message}</level>",
+        level="INFO",
+    )
+    logger.add(
+        "logs/training.log",
+        rotation="500 MB",
+        retention="10 days",
+        format="{time:YYYY-MM-DD HH:mm:ss} | {level: <8} | {message}",
+        level="DEBUG",
     )
 
-    # Configure the dataset
+    # Parse command line arguments
+    parser = argparse.ArgumentParser(
+        description="Train Ministral-3-vl vision-language model with custom configurations"
+    )
+
+    # Model arguments
+    parser.add_argument(
+        "--model-name",
+        type=str,
+        default="unsloth/Ministral-3-3B-Instruct-2512",
+        help="Name/path of model to load",
+    )
+    parser.add_argument(
+        "--load-in-4bit",
+        action="store_true",
+        help="Load model in 4-bit quantization (reduces memory usage)",
+    )
+    parser.add_argument(
+        "--use-gradient-checkpointing",
+        type=str,
+        default="unsloth",
+        help="Gradient checkpointing strategy (default: unsloth)",
+    )
+    parser.add_argument(
+        "--r",
+        type=int,
+        default=32,
+        help="LoRA rank (default: 32)",
+    )
+    parser.add_argument(
+        "--lora-alpha",
+        type=int,
+        default=32,
+        help="LoRA alpha parameter (default: 32)",
+    )
+    parser.add_argument(
+        "--lora-dropout",
+        type=int,
+        default=0,
+        help="LoRA dropout (default: 0)",
+    )
+    parser.add_argument(
+        "--finetune-vision-layers",
+        action="store_true",
+        default=True,
+        help="Finetune vision layers (default: True)",
+    )
+    parser.add_argument(
+        "--finetune-language-layers",
+        action="store_true",
+        default=True,
+        help="Finetune language layers (default: True)",
+    )
+    parser.add_argument(
+        "--finetune-attention-modules",
+        action="store_true",
+        default=True,
+        help="Finetune attention modules (default: True)",
+    )
+    parser.add_argument(
+        "--finetune-mlp-modules",
+        action="store_true",
+        default=True,
+        help="Finetune MLP modules (default: True)",
+    )
+
+    # Dataset arguments
+    parser.add_argument(
+        "--dataset-name",
+        type=str,
+        default="unsloth/LaTeX_OCR",
+        help="Name/path of dataset to load",
+    )
+    parser.add_argument(
+        "--dataset-split",
+        type=str,
+        default="train",
+        help="Dataset split to use (default: train)",
+    )
+    parser.add_argument(
+        "--instruction",
+        type=str,
+        default="Write the LaTeX representation for this image.",
+        help="Instruction for the model",
+    )
+
+    # Training arguments
+    parser.add_argument(
+        "--per-device-train-batch-size",
+        type=int,
+        default=4,
+        help="Per device training batch size (default: 4)",
+    )
+    parser.add_argument(
+        "--gradient-accumulation-steps",
+        type=int,
+        default=2,
+        help="Gradient accumulation steps (default: 2)",
+    )
+    parser.add_argument(
+        "--warmup-steps",
+        type=int,
+        default=5,
+        help="Number of warmup steps (default: 5)",
+    )
+    parser.add_argument(
+        "--max-steps",
+        type=int,
+        default=30,
+        help="Maximum number of training steps (default: 30)",
+    )
+    parser.add_argument(
+        "--num-train-epochs",
+        type=int,
+        default=None,
+        help="Number of training epochs (overrides max-steps)",
+    )
+    parser.add_argument(
+        "--learning-rate",
+        type=float,
+        default=2e-4,
+        help="Learning rate (default: 2e-4)",
+    )
+    parser.add_argument(
+        "--logging-steps",
+        type=int,
+        default=1,
+        help="Logging frequency in steps (default: 1)",
+    )
+    parser.add_argument(
+        "--optim",
+        type=str,
+        default="adamw_8bit",
+        help="Optimizer to use (default: adamw_8bit)",
+    )
+    parser.add_argument(
+        "--weight-decay",
+        type=float,
+        default=0.001,
+        help="Weight decay (default: 0.001)",
+    )
+    parser.add_argument(
+        "--lr-scheduler-type",
+        type=str,
+        default="linear",
+        help="Learning rate scheduler type (default: linear)",
+    )
+    parser.add_argument(
+        "--seed",
+        type=int,
+        default=3407,
+        help="Random seed (default: 3407)",
+    )
+    parser.add_argument(
+        "--output-dir",
+        type=str,
+        default="outputs",
+        help="Output directory (default: outputs)",
+    )
+    parser.add_argument(
+        "--report-to",
+        type=str,
+        default="tensorboard",
+        help="Where to report metrics (default: tensorboard)",
+    )
+    parser.add_argument(
+        "--max-length",
+        type=int,
+        default=2048,
+        help="Maximum sequence length (default: 2048)",
+    )
+
+    # Export arguments
+    parser.add_argument(
+        "--save-local-16bit",
+        action="store_true",
+        help="Save model locally in 16-bit format",
+    )
+    parser.add_argument(
+        "--save-local-path",
+        type=str,
+        default="unsloth_finetune",
+        help="Local path to save model (default: unsloth_finetune)",
+    )
+    parser.add_argument(
+        "--push-to-hub",
+        action="store_true",
+        help="Push model to Hugging Face Hub",
+    )
+    parser.add_argument(
+        "--hub-model-id",
+        type=str,
+        default="YOUR_USERNAME/unsloth_finetune",
+        help="Hugging Face Hub model ID",
+    )
+    parser.add_argument(
+        "--push-gguf",
+        action="store_true",
+        help="Push GGUF quantized model to Hub",
+    )
+    parser.add_argument(
+        "--gguf-model-id",
+        type=str,
+        default="hf/unsloth_finetune",
+        help="GGUF model ID",
+    )
+
+    # Parse arguments
+    args = parser.parse_args()
+
+    # Configure model
+    model_config = ModelConfig(
+        model_name=args.model_name,
+        load_in_4bit=args.load_in_4bit,
+        use_gradient_checkpointing=args.use_gradient_checkpointing,
+        finetune_vision_layers=args.finetune_vision_layers,
+        finetune_language_layers=args.finetune_language_layers,
+        finetune_attention_modules=args.finetune_attention_modules,
+        finetune_mlp_modules=args.finetune_mlp_modules,
+        r=args.r,
+        lora_alpha=args.lora_alpha,
+        lora_dropout=args.lora_dropout,
+    )
+
+    # Configure dataset
     dataset_config = DatasetConfig(
-        dataset_name="unsloth/LaTeX_OCR",
-        dataset_split="train",
-        instruction="Write the LaTeX representation for this image.",
+        dataset_name=args.dataset_name,
+        dataset_split=args.dataset_split,
+        instruction=args.instruction,
     )
 
     # Configure training parameters
     training_config = TrainingConfig(
-        per_device_train_batch_size=4,
-        gradient_accumulation_steps=2,
-        warmup_steps=5,
-        max_steps=30,  # Use num_train_epochs for full training runs
-        learning_rate=2e-4,
-        logging_steps=1,
-        optim="adamw_8bit",
-        weight_decay=0.001,
-        lr_scheduler_type="linear",
-        seed=3407,
-        output_dir="outputs",
-        report_to="tensorboard",
-        max_length=2048,
+        per_device_train_batch_size=args.per_device_train_batch_size,
+        gradient_accumulation_steps=args.gradient_accumulation_steps,
+        warmup_steps=args.warmup_steps,
+        max_steps=args.max_steps,
+        num_train_epochs=args.num_train_epochs,
+        learning_rate=args.learning_rate,
+        logging_steps=args.logging_steps,
+        optim=args.optim,
+        weight_decay=args.weight_decay,
+        lr_scheduler_type=args.lr_scheduler_type,
+        seed=args.seed,
+        output_dir=args.output_dir,
+        report_to=args.report_to,
+        max_length=args.max_length,
     )
 
     # Configure export options
     export_config = ExportConfig(
-        save_local_16bit=True,
-        save_local_path="unsloth_finetune",
-        push_to_hub=False,  # Set to True to push to Hugging Face Hub
-        hub_model_id="YOUR_USERNAME/unsloth_finetune",
-        push_gguf=False,  # Set to True to push GGUF quantized model
+        save_local_16bit=args.save_local_16bit,
+        save_local_path=args.save_local_path,
+        push_to_hub=args.push_to_hub,
+        hub_model_id=f"{settings.huggingface_username}/{args.hub_model_id}",
+        push_gguf=args.push_gguf,
+        gguf_model_id=f"{settings.huggingface_username}/{args.gguf_model_id}",
     )
 
     # Create trainer instance

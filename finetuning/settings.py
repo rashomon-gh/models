@@ -4,6 +4,7 @@ from pydantic import SecretStr
 
 class Settings(BaseSettings):
     huggingface_token: SecretStr
+    huggingface_username: str
 
     class Config:
         env_file = ".env"
