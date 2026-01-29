@@ -63,3 +63,5 @@ htmlcov/
 # Data
 data/
 datasets/
+
+*_cache/
