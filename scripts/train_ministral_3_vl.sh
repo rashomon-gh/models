@@ -22,7 +22,7 @@ cd "$PROJECT_ROOT"
 mkdir -p logs
 
 # Default values for training
-MODEL_NAME="unsloth/Ministral-3-3B-Instruct-2512"
+MODEL_NAME="unsloth/Ministral-3-14B-Reasoning-2512"
 LOAD_IN_4BIT="false"
 USE_GRADIENT_CHECKPOINTING="unsloth"
 R=32
@@ -51,9 +51,9 @@ MAX_LENGTH=2048
 SAVE_LOCAL_16BIT="false"
 SAVE_LOCAL_PATH="unsloth_finetune"
 PUSH_TO_HUB="true"
-HUB_MODEL_ID="ministral-3-vl"
+HUB_MODEL_ID="Ministral-3-14B-Reasoning-2512"
 PUSH_GGUF="true"
-GGUF_MODEL_ID="ministral-3-vl-gguf"
+GGUF_MODEL_ID="Ministral-3-14B-Reasoning-2512-gguf"
 
 # Parse command line arguments
 while [[ $# -gt 0 ]]; do
@@ -230,56 +230,62 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-# Build Python arguments
-PYTHON_ARGS="--model-name '$MODEL_NAME'"
+# Build Python arguments as an array
+PYTHON_ARGS=(
+    --model-name "$MODEL_NAME"
+)
 
 if [ "$LOAD_IN_4BIT" = "true" ]; then
-    PYTHON_ARGS="$PYTHON_ARGS --load-in-4bit"
+    PYTHON_ARGS+=(--load-in-4bit)
 fi
 
-PYTHON_ARGS="$PYTHON_ARGS --use-gradient-checkpointing '$USE_GRADIENT_CHECKPOINTING'"
-PYTHON_ARGS="$PYTHON_ARGS --r $R"
-PYTHON_ARGS="$PYTHON_ARGS --lora-alpha $LORA_ALPHA"
-PYTHON_ARGS="$PYTHON_ARGS --lora-dropout $LORA_DROPOUT"
-PYTHON_ARGS="$PYTHON_ARGS --dataset-name '$DATASET_NAME'"
-PYTHON_ARGS="$PYTHON_ARGS --dataset-split '$DATASET_SPLIT'"
-PYTHON_ARGS="$PYTHON_ARGS --instruction '$INSTRUCTION'"
-PYTHON_ARGS="$PYTHON_ARGS --per-device-train-batch-size $PER_DEVICE_TRAIN_BATCH_SIZE"
-PYTHON_ARGS="$PYTHON_ARGS --gradient-accumulation-steps $GRADIENT_ACCUMULATION_STEPS"
-PYTHON_ARGS="$PYTHON_ARGS --warmup-steps $WARMUP_STEPS"
-PYTHON_ARGS="$PYTHON_ARGS --max-steps $MAX_STEPS"
+PYTHON_ARGS+=(
+    --use-gradient-checkpointing "$USE_GRADIENT_CHECKPOINTING"
+    --r "$R"
+    --lora-alpha "$LORA_ALPHA"
+    --lora-dropout "$LORA_DROPOUT"
+    --dataset-name "$DATASET_NAME"
+    --dataset-split "$DATASET_SPLIT"
+    --instruction "$INSTRUCTION"
+    --per-device-train-batch-size "$PER_DEVICE_TRAIN_BATCH_SIZE"
+    --gradient-accumulation-steps "$GRADIENT_ACCUMULATION_STEPS"
+    --warmup-steps "$WARMUP_STEPS"
+    --max-steps "$MAX_STEPS"
+)
 
 if [ -n "$NUM_TRAIN_EPOCHS" ]; then
-    PYTHON_ARGS="$PYTHON_ARGS --num-train-epochs $NUM_TRAIN_EPOCHS"
+    PYTHON_ARGS+=(--num-train-epochs "$NUM_TRAIN_EPOCHS")
 fi
 
-PYTHON_ARGS="$PYTHON_ARGS --learning-rate $LEARNING_RATE"
-PYTHON_ARGS="$PYTHON_ARGS --logging-steps $LOGGING_STEPS"
-PYTHON_ARGS="$PYTHON_ARGS --optim '$OPTIM'"
-PYTHON_ARGS="$PYTHON_ARGS --weight-decay $WEIGHT_DECAY"
-PYTHON_ARGS="$PYTHON_ARGS --lr-scheduler-type '$LR_SCHEDULER_TYPE'"
-PYTHON_ARGS="$PYTHON_ARGS --seed $SEED"
-PYTHON_ARGS="$PYTHON_ARGS --output-dir '$OUTPUT_DIR'"
-PYTHON_ARGS="$PYTHON_ARGS --report-to '$REPORT_TO'"
-PYTHON_ARGS="$PYTHON_ARGS --max-length $MAX_LENGTH"
+PYTHON_ARGS+=(
+    --learning-rate "$LEARNING_RATE"
+    --logging-steps "$LOGGING_STEPS"
+    --optim "$OPTIM"
+    --weight-decay "$WEIGHT_DECAY"
+    --lr-scheduler-type "$LR_SCHEDULER_TYPE"
+    --seed "$SEED"
+    --output-dir "$OUTPUT_DIR"
+    --report-to "$REPORT_TO"
+    --max-length "$MAX_LENGTH"
+)
 
 if [ "$SAVE_LOCAL_16BIT" = "true" ]; then
-    PYTHON_ARGS="$PYTHON_ARGS --save-local-16bit"
+    PYTHON_ARGS+=(--save-local-16bit)
 fi
 
-PYTHON_ARGS="$PYTHON_ARGS --save-local-path '$SAVE_LOCAL_PATH'"
+PYTHON_ARGS+=(--save-local-path "$SAVE_LOCAL_PATH")
 
 if [ "$PUSH_TO_HUB" = "true" ]; then
-    PYTHON_ARGS="$PYTHON_ARGS --push-to-hub"
+    PYTHON_ARGS+=(--push-to-hub)
 fi
 
-PYTHON_ARGS="$PYTHON_ARGS --hub-model-id '$HUB_MODEL_ID'"
+PYTHON_ARGS+=(--hub-model-id "$HUB_MODEL_ID")
 
 if [ "$PUSH_GGUF" = "true" ]; then
-    PYTHON_ARGS="$PYTHON_ARGS --push-gguf"
+    PYTHON_ARGS+=(--push-gguf)
 fi
 
-PYTHON_ARGS="$PYTHON_ARGS --gguf-model-id '$GGUF_MODEL_ID'"
+PYTHON_ARGS+=(--gguf-model-id "$GGUF_MODEL_ID")
 
 # Display configuration
 echo "================================"
@@ -298,7 +304,7 @@ echo ""
 echo "Starting training..."
 echo ""
 
-python -m models.ministral_3_vl $PYTHON_ARGS
+python -m models.ministral_3_vl "${PYTHON_ARGS[@]}"
 
 echo ""
 echo "Training completed!"
