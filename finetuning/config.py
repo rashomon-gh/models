@@ -1,12 +1,11 @@
 from pydantic import BaseModel, SecretStr
 from typing import List, Optional
-from finetuning.settings import settings
 
 
 class ModelConfig(BaseModel):
     """Configuration for model loading and LoRA setup."""
 
-    model_name: str = "unsloth/Ministral-3-3B-Instruct-2512"
+    model_name: str
     load_in_4bit: bool = False
     use_gradient_checkpointing: str = "unsloth"
 
@@ -27,7 +26,7 @@ class ModelConfig(BaseModel):
 class DatasetConfig(BaseModel):
     """Configuration for dataset loading and processing."""
 
-    dataset_name: str = "unsloth/LaTeX_OCR"
+    dataset_name: str
     dataset_split: str = "train"
     instruction: str = "Write the LaTeX representation for this image."
 
@@ -58,15 +57,9 @@ class ExportConfig(BaseModel):
     save_local_path: str = "unsloth_finetune"
 
     push_to_hub: bool = False
-    hub_model_id: str = "YOUR_USERNAME/unsloth_finetune"
+    hub_model_id: str
     hub_token: Optional[SecretStr] = None
 
     push_gguf: bool = False
     gguf_model_id: str = "hf/unsloth_finetune"
     gguf_quantization_methods: List[str] = ["q4_k_m", "q8_0", "q5_k_m"]
-
-    def __init__(self, **data):
-        # Use settings token if not provided
-        if "hub_token" not in data or data["hub_token"] is None:
-            data["hub_token"] = settings.huggingface_token
-        super().__init__(**data)

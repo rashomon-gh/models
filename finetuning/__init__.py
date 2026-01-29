@@ -5,7 +5,6 @@ from finetuning.config import (
     TrainingConfig,
     ExportConfig,
 )
-from finetuning.base_trainer import BaseVisionModelTrainer
 
 __all__ = [
     "settings",
@@ -13,5 +12,4 @@ __all__ = [
     "DatasetConfig",
     "TrainingConfig",
     "ExportConfig",
-    "BaseVisionModelTrainer",
 ]
