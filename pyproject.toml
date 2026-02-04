@@ -16,6 +16,11 @@ dependencies = [
     "editables>=0.5",
     "torch==2.8.0",
     "axolotl[deepspeed,flash-attn]>=0.14.0",
+    "ipython>=9.10.0",
+    "jupyterlab>=4.5.3",
+    "pandas>=2.3.3",
+    "polars>=1.38.0",
+    "matplotlib>=3.10.8",
 ]
 
 [build-system]
