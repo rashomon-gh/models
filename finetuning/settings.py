@@ -5,6 +5,7 @@ from pydantic import SecretStr
 class Settings(BaseSettings):
     huggingface_token: SecretStr
     huggingface_username: str
+    wandb_api_key: SecretStr
 
     class Config:
         env_file = ".env"
