@@ -954,6 +954,20 @@ wheels = [
 ]
 
 [[package]]
+name = "cut-cross-entropy"
+version = "25.5.2"
+source = { git = "https://github.com/axolotl-ai-cloud/ml-cross-entropy.git?rev=f4b5712#f4b571294a8b6c12b2e8452c3de81cc7b0776c3d" }
+dependencies = [
+    { name = "torch" },
+    { name = "triton", marker = "sys_platform != 'darwin'" },
+]
+
+[package.optional-dependencies]
+transformers = [
+    { name = "transformers" },
+]
+
+[[package]]
 name = "cycler"
 version = "0.12.1"
 source = { registry = "https://pypi.org/simple" }
@@ -1200,6 +1214,7 @@ version = "0.1.0"
 source = { editable = "." }
 dependencies = [
     { name = "axolotl", extra = ["deepspeed", "flash-attn"] },
+    { name = "cut-cross-entropy", extra = ["transformers"] },
     { name = "datasets" },
     { name = "editables" },
     { name = "hatchling" },
@@ -1226,6 +1241,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "axolotl", extras = ["deepspeed", "flash-attn"], specifier = ">=0.14.0" },
+    { name = "cut-cross-entropy", extras = ["transformers"], git = "https://github.com/axolotl-ai-cloud/ml-cross-entropy.git?rev=f4b5712" },
     { name = "datasets", specifier = ">=4.0.0" },
     { name = "editables", specifier = ">=0.5" },
     { name = "hatchling", specifier = ">=1.28.0" },
