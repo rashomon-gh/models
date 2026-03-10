@@ -24,6 +24,7 @@ dependencies = [
     "wandb>=0.25.0",
     "xformers==0.0.32.post2",
     "transformers==5.2.0",
+    "flash-linear-attention>=0.4.1",
 ]
 
 [build-system]
