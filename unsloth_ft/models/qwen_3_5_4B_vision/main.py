@@ -77,6 +77,7 @@ class Qwen3_5_4B_Vision:
             self.model_name,
             load_in_4bit=False,  # Use 4bit to reduce memory use. False for 16bit LoRA.
             use_gradient_checkpointing="unsloth",  # True or "unsloth" for long context
+            device_map={"": 0},  # Force single GPU to avoid distributed mode error
         )
 
         # load LoRA adapters
