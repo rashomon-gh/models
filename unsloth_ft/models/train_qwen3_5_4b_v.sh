@@ -1,11 +1,11 @@
 #!/bin/bash
 #SBATCH --job-name=train-qwen-3-5-4b-vision
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=8
+#SBATCH --cpus-per-task=2
 #SBATCH --partition=gpu_a100
 #SBATCH --nodes=1
 #SBATCH --gpus-per-node=1
-#SBATCH --time=1:00:00
+#SBATCH --time=2:00:00
 #SBATCH --output=logs/train_qwen_3_5_4b_vision_%j.log
 #SBATCH --error=logs/train_qwen_3_5_4b_vision_%j.err
 
@@ -54,9 +54,7 @@ echo "=========================================="
 echo "Job started at: $(date)"
 echo "Running on node: $(hostname)"
 echo "Python version: $(python --version)"
-echo "Virtual environment: $VIRTUAL_ENV"
 echo "HF_HOME: $HF_HOME"
-echo "PYTHONPATH: $PYTHONPATH"
 echo "=========================================="
 
 # run
