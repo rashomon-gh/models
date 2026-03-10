@@ -35,14 +35,18 @@ mkdir -p $PROJECT_DIR/logs
 # Create virtual environment if it doesn't exist
 if [ ! -d "$VENV_DIR" ]; then
     echo "Creating virtual environment..."
-    python -m venv $VENV_DIR
+    # install uv
+    pip install --user uv
+    # creates virtual environment and installs dependencies
+    uv sync --no-cache --no-lock
 fi
 
 # Activate virtual environment
 source $VENV_DIR/bin/activate
 # install packages
 cd $PROJECT_DIR
-pip install -e .
+
+
 
 
 # Print environment info for debugging
