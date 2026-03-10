@@ -49,8 +49,8 @@ echo "HF_HOME: $HF_HOME"
 echo "=========================================="
 
 # run
-# python qwen_3_5_4B_vision/main.py --save=True --push=False
-python qwen_3_5_4B_vision/main.py --save=False --push=True
+# python main.py --save=True --push=False
+python main.py --save=False --push=True
 
 # Print completion info
 echo "=========================================="
