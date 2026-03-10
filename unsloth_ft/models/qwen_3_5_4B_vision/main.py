@@ -155,15 +155,18 @@ class Qwen3_5_4B_Vision:
 
     def save_model(self):
         logger.info(f"Saving 16-bit model to {self.model_name}-16bit")
+        
+        save_name = f"{self.model_name.replace('unsloth/', '')}-16bit"
         self.model.save_pretrained_merged( # pyright: ignore[reportOptionalMemberAccess]
-            f"{self.model_name}-16bit",
+            save_name,
             self.tokenizer,
         )  # type:ignore
 
     def push_to_hub(self):
-        logger.info(f"Pushing model to Hugging Face Hub with name: {self.model_name}")
+        save_name = f"{api_keys.huggingface_username}/{self.model_name.replace("unsloth/", "")}-16bit"
+        logger.info(f"Pushing model to Hugging Face Hub with name: {self.model_name.replace("unsloth/", "")}")
         self.model.push_to_hub_merged(  # type:ignore
-            f"{api_keys.huggingface_username}/{self.model_name}-16bit",
+            save_name,
             self.tokenizer,
             token=api_keys.huggingface_token.get_secret_value(),
         )
