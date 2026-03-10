@@ -1,3 +1,4 @@
+import unsloth  # noqa: F401
 import wandb
 from config.keys import api_keys
 from datasets import load_dataset
@@ -5,6 +6,7 @@ from loguru import logger
 from trl import SFTConfig, SFTTrainer  # type:ignore
 from unsloth import FastVisionModel
 from unsloth.trainer import UnslothVisionDataCollator
+from fire import Fire
 
 logger.info("Setting up Weights and Biases (wandb) for experiment tracking")
 wandb.login(key=api_keys.wandb_api_key.get_secret_value())
@@ -54,7 +56,7 @@ def convert_to_conversation(sample):
     return {"messages": conversation}
 
 
-class Qwen3_5_Vision:
+class Qwen3_5_4B_Vision:
     def __init__(self):
         self.model = None
         self.tokenizer = None
@@ -156,8 +158,18 @@ class Qwen3_5_Vision:
             token=api_keys.huggingface_token.get_secret_value(),
         )
 
+
+def main(save: bool = True, push: bool = False):
+    model = Qwen3_5_4B_Vision()
+    trainer_stats = model.train()
+
+    if save:
+        model.save_model()
+
+    if push:
+        model.push_to_hub()
+
+    return trainer_stats
+
 if __name__ == "__main__":
-    qwen_3_5_vision = Qwen3_5_Vision()
-    training_stats = qwen_3_5_vision.train()
-    qwen_3_5_vision.save_model()
-    qwen_3_5_vision.push_to_hub()
+    Fire(main)
