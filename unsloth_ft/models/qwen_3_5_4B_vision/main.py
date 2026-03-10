@@ -155,3 +155,9 @@ class Qwen3_5_Vision:
             self.tokenizer,
             token=api_keys.huggingface_token.get_secret_value(),
         )
+
+if __name__ == "__main__":
+    qwen_3_5_vision = Qwen3_5_Vision()
+    training_stats = qwen_3_5_vision.train()
+    qwen_3_5_vision.save_model()
+    qwen_3_5_vision.push_to_hub()
