@@ -77,7 +77,7 @@ class Qwen3_5_4B_Vision:
             self.model_name,
             load_in_4bit=False,  # Use 4bit to reduce memory use. False for 16bit LoRA.
             use_gradient_checkpointing="unsloth",  # True or "unsloth" for long context
-            device_map={"": 0},  # Force single GPU to avoid distributed mode error
+            device_map="cuda", 
         )
 
         # load LoRA adapters
@@ -103,10 +103,17 @@ class Qwen3_5_4B_Vision:
         self.training_dataset = load_dataset(self.dataset_name, split="train")
         # using the test dataset for validation 
         self.validation_dataset = load_dataset(self.dataset_name, split="test")
+        
+    def __convert_dataset(self):
+        logger.info("Converting dataset samples into conversation format for training")
+        self.training_dataset = [convert_to_conversation(sample) for sample in self.training_dataset] # type: ignore
+        logger.info("Converting validation dataset samples into conversation format for evaluation")
+        self.validation_dataset = [convert_to_conversation(sample) for sample in self.validation_dataset] # type: ignore
 
     def train(self):
         self.__load_peft_model()
         self.__load_dataset()
+        self.__convert_dataset()
 
         FastVisionModel.for_training(self.model)  # Enable for training!
 
