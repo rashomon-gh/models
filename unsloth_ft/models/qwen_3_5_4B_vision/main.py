@@ -20,7 +20,7 @@ wandb.init(
             "per_device_train_batch_size": 8,
             "gradient_accumulation_steps": 4,
             "warmup_steps": 5,
-            "num_train_epochs": 50,
+            "max_steps": 50,
             "learning_rate": 2e-4,
             "logging_steps": 1,
             "optim": "adamw_8bit",
@@ -100,7 +100,8 @@ class Qwen3_5_4B_Vision:
         # Load the dataset using Hugging Face's datasets library
         logger.info(f"Loading dataset: {self.dataset_name}")
         self.training_dataset = load_dataset(self.dataset_name, split="train")
-        self.validation_dataset = load_dataset(self.dataset_name, split="validation")
+        # using the test dataset for validation 
+        self.validation_dataset = load_dataset(self.dataset_name, split="test")
 
     def train(self):
         self.__load_peft_model()
@@ -116,12 +117,13 @@ class Qwen3_5_4B_Vision:
                 self.model, self.tokenizer
             ),  # Must use!
             train_dataset=self.training_dataset,
+            eval_dataset=self.validation_dataset,
             args=SFTConfig(
                 per_device_train_batch_size=8,
                 gradient_accumulation_steps=4,
                 warmup_steps=5,
-                # max_steps = 30,
-                num_train_epochs=50,  # Set this instead of max_steps for full training runs
+                max_steps = 50,
+                # num_train_epochs=50,  # Set this instead of max_steps for full training runs
                 learning_rate=2e-4,
                 logging_steps=1,
                 optim="adamw_8bit",
