@@ -1,5 +1,6 @@
 from pydantic import SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from loguru import logger
 
 class ApiKeys(BaseSettings):
     huggingface_token: SecretStr
@@ -10,3 +11,4 @@ class ApiKeys(BaseSettings):
 
 
 api_keys = ApiKeys() # type: ignore
+logger.debug(f"Loaded API keys: {api_keys}")
