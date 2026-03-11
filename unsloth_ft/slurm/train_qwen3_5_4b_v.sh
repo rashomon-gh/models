@@ -49,7 +49,7 @@ echo "HF_HOME: $HF_HOME"
 echo "=========================================="
 
 # run
-python qwen_3_5_4B_vision/main.py --save=False --push=True
+python models/qwen_3_5_4B_vision.py --save=False --push=True
 
 # Print completion info
 echo "=========================================="
