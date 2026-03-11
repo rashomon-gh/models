@@ -35,7 +35,7 @@ mkdir -p $PROJECT_DIR/logs
 # Activate virtual environment
 source $VENV_DIR/bin/activate
 # install packages
-cd $PROJECT_DIR
+cd $PROJECT_DIR/glm_4_7_flash
 
 
 
