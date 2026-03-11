@@ -172,9 +172,11 @@ class Qwen3_5_4B_Vision:
         )
 
 
-def main(save: bool = True, push: bool = False):
+def main(save: bool = False, push: bool = True):
     model = Qwen3_5_4B_Vision()
     trainer_stats = model.train()
+    
+    logger.info(trainer_stats)
 
     if save:
         model.save_model()
