@@ -138,6 +138,7 @@ class GLM_4_7_Flash:
                 weight_decay = 0.001,
                 lr_scheduler_type = "linear",
                 seed = 3407,
+                bf16 = True,  # Enable BFloat16 mixed precision for MoE compatibility
                 report_to = "wandb", # Use TrackIO/WandB etc
             )
         )
