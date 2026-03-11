@@ -89,7 +89,7 @@ class GLM_4_7_Flash:
         
         self.model = FastLanguageModel.get_peft_model(
             self.model,
-            r = 64, # Choose any number > 0 ! Suggested 8, 16, 32, 64, 128
+            r = 16, # Choose any number > 0 ! Suggested 8, 16, 32, 64, 128
             target_modules = ["q_proj", "k_proj", "v_proj", "o_proj",
                             "gate_proj", "up_proj", "down_proj",
                             "out_proj",],
