@@ -1,3 +1,4 @@
+import torch
 import unsloth  # noqa: F401
 import wandb
 from config.keys import api_keys
@@ -72,8 +73,9 @@ class GLM_4_7_Flash:
         self.model, self.tokenizer = FastLanguageModel.from_pretrained(
             model_name = self.model_name,
             max_seq_length = 64 * 1000, # 64K context length
+            dtype = torch.bfloat16,  # Explicitly set BFloat16 for MoE compatibility
             load_in_4bit = False,  # 4 bit quantization to reduce memory
-            load_in_8bit = False, 
+            load_in_8bit = False,
             full_finetuning = False,
             trust_remote_code = True,
             unsloth_force_compile = False,
@@ -91,7 +93,7 @@ class GLM_4_7_Flash:
             bias = "none",    # Supports any, but = "none" is optimized
             use_gradient_checkpointing = "unsloth", # True or "unsloth" for very long context
             random_state = 3407,
-            use_rslora = False,  # We support rank stabilized LoRA
+            use_rslora = True,  # urse rank stabilised LoRA
             loftq_config = None, # And LoftQ
         )
         
