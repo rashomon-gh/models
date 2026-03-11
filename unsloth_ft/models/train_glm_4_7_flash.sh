@@ -34,8 +34,7 @@ mkdir -p $PROJECT_DIR/logs
 
 # Activate virtual environment
 source $VENV_DIR/bin/activate
-# install packages
-cd $PROJECT_DIR/glm_4_7_flash
+cd $PROJECT_DIR
 
 
 
@@ -50,7 +49,7 @@ echo "=========================================="
 
 
 # run
-python glm_4_7_flash/main.py --save=False --push=True
+python models/glm_4_7_flash/main.py --save=False --push=True
 
 # Print completion info
 echo "=========================================="
