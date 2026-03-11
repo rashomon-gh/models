@@ -1,3 +1,8 @@
+import os
+
+# Use native_torch MoE backend to avoid dtype mismatch issues with grouped_mm
+os.environ["UNSLOTH_MOE_BACKEND"] = "native_torch"
+
 import torch
 import unsloth  # noqa: F401
 import wandb
@@ -91,9 +96,9 @@ class GLM_4_7_Flash:
             lora_alpha = 16,
             lora_dropout = 0, # Supports any, but = 0 is optimized
             bias = "none",    # Supports any, but = "none" is optimized
-            use_gradient_checkpointing = "unsloth", # True or "unsloth" for very long context
+            use_gradient_checkpointing = "unsloth", # Disabled to avoid dtype mismatch issues
             random_state = 3407,
-            use_rslora = True,  # urse rank stabilised LoRA
+            use_rslora = False,  # urse rank stabilised LoRA
             loftq_config = None, # And LoftQ
         )
         
