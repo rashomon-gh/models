@@ -1,17 +1,17 @@
 #!/bin/bash
-#SBATCH --job-name=train-glm-4-7-flash
+#SBATCH --job-name=train-qwen-3-5-4b-vision
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=4
-#SBATCH --partition=gpu_h100
+#SBATCH --cpus-per-task=2
+#SBATCH --partition=gpu_a100
 #SBATCH --nodes=1
 #SBATCH --gpus-per-node=1
-#SBATCH --time=3:00:00
-#SBATCH --output=logs/glm47_%j.log
-#SBATCH --error=logs/glm47_%j.err
+#SBATCH --time=2:00:00
+#SBATCH --output=logs/train_qwen_3_5_4b_vision_%j.log
+#SBATCH --error=logs/train_qwen_3_5_4b_vision_%j.err
 
 
-# This is a SLURM script to train the GLM 4.7 Flash model using 
-# the main.py script in the current directory. This script is 
+# This is a SLURM script to train the Qwen 3.5 4B Vision model using 
+# the main.py script in the qwen_3_5_4B_vision directory. This script is 
 # suited to run on Snellius cluster, and assumes that 
 # the Hugging Face cache directory is set to a location in the scratch space.
 
@@ -35,7 +35,7 @@ mkdir -p $PROJECT_DIR/logs
 # Activate virtual environment
 source $VENV_DIR/bin/activate
 # install packages
-cd $PROJECT_DIR/glm_4_7_flash
+cd $PROJECT_DIR
 
 
 
@@ -48,9 +48,8 @@ echo "Python version: $(python --version)"
 echo "HF_HOME: $HF_HOME"
 echo "=========================================="
 
-
 # run
-python main.py --save=False --push=True
+python qwen_3_5_4B_vision/main.py --save=False --push=True
 
 # Print completion info
 echo "=========================================="
