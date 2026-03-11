@@ -1,1 +1,4 @@
 wandb/
+outputs/
+logs/
+unsloth_compiled_cache/
