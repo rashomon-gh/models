@@ -1,3 +1,3 @@
-# fine-tuning
+# models
 
-A collection of fine-tuning scripts using LoRA/PEFT methods.
+A collection of cripts for fine-tuning LLMs/VLMs using LoRA/PEFT methods and other experiments.
