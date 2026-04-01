@@ -8,10 +8,12 @@ import unsloth  # noqa: F401
 import wandb
 from config.keys import api_keys
 from datasets import load_dataset
-from loguru import logger
+from logging import setup_logging
 from trl import SFTConfig, SFTTrainer  # type:ignore
 from unsloth import FastLanguageModel
 from fire import Fire
+
+logger = setup_logging()
 
 logger.info("Starting GLM-4.7-Flash training script")
 wandb.login(key=api_keys.wandb_api_key.get_secret_value())

@@ -49,7 +49,7 @@ echo "=========================================="
 
 
 # run
-python models/glm_4_7_flash.py --save=False --push=True
+python -u models/glm_4_7_flash.py --save=False --push=True
 
 # Print completion info
 echo "=========================================="

@@ -2,11 +2,14 @@ import unsloth  # noqa: F401
 import wandb
 from config.keys import api_keys
 from datasets import load_dataset
-from loguru import logger
+from logging import setup_logging
 from trl import SFTConfig, SFTTrainer  # type:ignore
 from unsloth import FastVisionModel
 from unsloth.trainer import UnslothVisionDataCollator
 from fire import Fire
+
+
+logger = setup_logging()
 
 logger.info("Setting up Weights and Biases (wandb) for experiment tracking")
 wandb.login(key=api_keys.wandb_api_key.get_secret_value())
