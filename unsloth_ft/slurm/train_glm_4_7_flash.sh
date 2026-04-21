@@ -26,7 +26,7 @@ module load 2024
 module load Python/3.12.3-GCCcore-13.3.0
 
 # paths
-PROJECT_DIR=$HOME/projects/fine-tuning/unsloth_ft
+PROJECT_DIR=$HOME/projects/models/unsloth_ft
 VENV_DIR=$PROJECT_DIR/.venv
 
 # Create logs directory if it doesn't exist
