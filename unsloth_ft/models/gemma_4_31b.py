@@ -9,6 +9,7 @@ from unsloth import FastModel
 from fire import Fire
 from unsloth.chat_templates import get_chat_template
 from unsloth.chat_templates import standardize_data_formats
+from unsloth.chat_templates import train_on_responses_only
 
 
 logger = setup_logging()
@@ -130,7 +131,46 @@ class Gemma_4_31B:
             eval_dataset = None, # the dataset has no eval split
             args = training_args,
         )
+        trainer = train_on_responses_only(
+            trainer,
+            instruction_part="<|turn>user\n",
+            response_part="<|turn>model\n",
+        )
         
         logger.info("Started Training")
         trainer_stats = trainer.train()
         return trainer_stats
+    
+    
+    def save_model(self):
+        logger.info(f"Saving 16-bit model to {self.model_name}-16bit")
+        
+        save_name = f"{self.model_name.replace('unsloth/', '')}-16bit"
+        self.model.save_pretrained_merged( # pyright: ignore[reportOptionalMemberAccess]
+            save_name,
+            self.tokenizer,
+        )  # type:ignore
+
+    def push_to_hub(self):
+        save_name = f"{api_keys.huggingface_username}/{self.model_name.replace("unsloth/", "")}-16bit"
+        logger.info(f"Pushing model to Hugging Face Hub with name: {self.model_name.replace("unsloth/", "")}")
+        self.model.push_to_hub_merged(  # type:ignore
+            save_name,
+            self.tokenizer,
+            token=api_keys.huggingface_token.get_secret_value(),
+        )
+
+def main(save: bool = False, push: bool = True):
+    model = Gemma_4_31B()
+    trainer_stats = model.train()
+    logger.info(trainer_stats)
+
+    if save:
+        model.save_model()
+
+    if push:
+        model.push_to_hub()
+
+
+if __name__ == "__main__":
+    Fire(main)
