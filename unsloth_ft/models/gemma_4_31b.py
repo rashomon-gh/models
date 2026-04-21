@@ -3,7 +3,7 @@ import unsloth  # noqa: F401
 import wandb
 from config.keys import api_keys
 from datasets import load_dataset
-from logging import setup_logging
+from logging import setup_logging # type: ignore
 from trl import SFTConfig, SFTTrainer  # type:ignore
 from unsloth import FastModel
 from fire import Fire
@@ -17,7 +17,33 @@ logger = setup_logging()
 logger.info("Starting Gemma-4-31B training script")
 
 # TODO: wandb
-
+wandb.login(key=api_keys.wandb_api_key.get_secret_value())
+wandb.init(
+    project="Gemma-4-31B-SFT", 
+    name="Gemma-4-31B-SFT",
+    config={
+        "model_name": "unsloth/gemma-4-31B-it",
+        "dataset_name": "mlabonne/FineTome-100k",
+        "training_parameters": {
+            "per_device_train_batch_size": 2,
+            "gradient_accumulation_steps": 4,
+            "warmup_steps": 5,
+            "num_train_epochs": 3,
+            "learning_rate": 2e-5,
+            "logging_steps": 1,
+            "optim": "adamw_8bit",
+            "weight_decay": 0.001,
+            "lr_scheduler_type": "linear",
+        },
+        "peft_parameters": {
+            "r": 8,
+            "lora_alpha": 8,
+            "lora_dropout": 0.1,
+            "bias": "none",
+            "random_state": 3407,
+        },
+    },
+)
 
 class Gemma_4_31B:
     def __init__(self):
@@ -64,11 +90,48 @@ class Gemma_4_31B:
         
     def formatting_prompts_func(self, examples):
         convos = examples["conversations"]
-        texts = [self.tokenizer.apply_chat_template(convo, tokenize = False, add_generation_prompt = False).removeprefix('<bos>') for convo in convos]
+        texts = [
+            self.tokenizer.apply_chat_template( # type: ignore
+                convo, 
+                tokenize = False, 
+                add_generation_prompt = False
+            ).removeprefix('<bos>') for convo in convos] 
         return { "text" : texts, }
         
     def __load_datasets(self):
         logger.info(f"Loading dataset {self.dataset_name}")
         self.training_dataset = load_dataset(self.dataset_name, split="train")
         self.training_dataset = standardize_data_formats(self.training_dataset)
-        self.training_dataset = self.training_dataset.map(self.formatting_prompts_func, batched=True, num_proc=4)
+        self.training_dataset = self.training_dataset.map(self.formatting_prompts_func, batched=True)
+
+    def train(self):
+        self.__load_peft_model()
+        self.__get_chat_template()
+        self.__load_datasets()
+        
+        training_args = SFTConfig(
+            dataset_text_field = "text",
+            per_device_train_batch_size = 2,
+            gradient_accumulation_steps = 4, # Use GA to mimic batch size!
+            warmup_steps = 5,
+            num_train_epochs = 3,
+            learning_rate = 2e-5, # Reduce to 2e-5 for long training runs
+            logging_steps = 1,
+            optim = "adamw_8bit",
+            weight_decay = 0.001,
+            lr_scheduler_type = "linear",
+            seed = 3407,
+            report_to = "wandb", # Use TrackIO/WandB etc
+        ),
+        
+        trainer = SFTTrainer(
+            model = self.model,
+            tokenizer = self.tokenizer, # type: ignore
+            train_dataset = self.training_dataset,
+            eval_dataset = None, # the dataset has no eval split
+            args = training_args,
+        )
+        
+        logger.info("Started Training")
+        trainer_stats = trainer.train()
+        return trainer_stats
