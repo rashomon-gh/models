@@ -3,7 +3,7 @@ import unsloth  # noqa: F401
 import wandb
 from config.keys import api_keys
 from datasets import load_dataset
-from logging import setup_logging # type: ignore
+from unsloth_ft.logging import setup_logging
 from trl import SFTConfig, SFTTrainer  # type:ignore
 from unsloth import FastModel
 from fire import Fire
