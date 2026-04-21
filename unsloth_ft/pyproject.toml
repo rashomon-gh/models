@@ -36,7 +36,7 @@ build-backend = "hatchling.build"
 packages = [
     "config",
     "models",
-    "logging",
+    "logger",
 ]
 
 [tool.uv.sources]
