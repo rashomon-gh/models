@@ -3,7 +3,8 @@ import unsloth  # noqa: F401
 import wandb
 from config.keys import api_keys
 from datasets import load_dataset
-from unsloth_ft.logging import setup_logging
+# from unsloth_ft.logging import setup_logging
+from loguru import logger
 from trl import SFTConfig, SFTTrainer  # type:ignore
 from unsloth import FastModel
 from fire import Fire
@@ -12,7 +13,7 @@ from unsloth.chat_templates import standardize_data_formats
 from unsloth.chat_templates import train_on_responses_only
 
 
-logger = setup_logging()
+# logger = setup_logging()
 
 logger.info("Starting Gemma-4-31B training script")
 
