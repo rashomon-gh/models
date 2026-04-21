@@ -7,7 +7,6 @@ from logging import setup_logging # type: ignore
 from trl import SFTConfig, SFTTrainer  # type:ignore
 from unsloth import FastModel
 from fire import Fire
-from transformers import TextStreamer
 from unsloth.chat_templates import get_chat_template
 from unsloth.chat_templates import standardize_data_formats
 
