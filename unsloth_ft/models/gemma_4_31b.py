@@ -61,10 +61,11 @@ class Gemma_4_31B:
         logger.info(f"Loading model {self.model_name} with PEFT")
         self.model, self.tokenizer = FastModel.from_pretrained(
             model_name = self.model_name,
-            dtype = torch.bfloat16,
             max_seq_length = 16384,
-            load_in_8bit = True, 
-            full_finetuning = False, 
+            load_in_4bit = False,
+            load_in_8bit = False,
+            load_in_16bit = True,
+            full_finetuning = False,
             token = api_keys.huggingface_token.get_secret_value(),
         )
         
