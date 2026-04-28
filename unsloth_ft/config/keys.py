@@ -7,7 +7,7 @@ class ApiKeys(BaseSettings):
     huggingface_username: str
     wandb_api_key: SecretStr
     
-    model_config = SettingsConfigDict(env_file="../.env")
+    model_config = SettingsConfigDict(env_file="../../.env")
 
 
 api_keys = ApiKeys() # type: ignore
