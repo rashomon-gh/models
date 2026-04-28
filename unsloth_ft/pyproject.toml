@@ -39,6 +39,6 @@ packages = [
     "ftlogger",
 ]
 
-[tool.uv.sources]
-unsloth-zoo = { git = "https://github.com/unslothai/unsloth-zoo" }
-unsloth = { git = "https://github.com/unslothai/unsloth" }
+# [tool.uv.sources]
+# unsloth-zoo = { git = "https://github.com/unslothai/unsloth-zoo" }
+# unsloth = { git = "https://github.com/unslothai/unsloth" }
