@@ -78,6 +78,8 @@ class Qwen3_5_4B_Vision:
         logger.info(f"Loading model: {self.model_name} with LoRA adapters")
         self.model, self.tokenizer = FastVisionModel.from_pretrained(
             self.model_name,
+            load_in_4bit=False,
+            load_in_8bit=False,
             load_in_16bit=True,  
             use_gradient_checkpointing="unsloth",  # True or "unsloth" for long context
             device_map="cuda", 
@@ -137,7 +139,7 @@ class Qwen3_5_4B_Vision:
                 # num_train_epochs=50,  # Set this instead of max_steps for full training runs
                 learning_rate=2e-4,
                 logging_steps=1,
-                optim="adamw_8bit",
+                optim="adamw_torch",
                 weight_decay=0.001,
                 lr_scheduler_type="linear",
                 seed=3407,
